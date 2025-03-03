@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AuthLayout from "../components/AuthLayout";
 import FormToggleLink from "../components/FormToggleLink";
 import SignInForm from "../components/SignInForm";
 import SignUpForm from "../components/SignUpForm";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
     const [isSignIn, setIsSignIn] = useState(true);
+    const navigate = useNavigate();
     
     const toggleForm = () => {
       setIsSignIn(!isSignIn);

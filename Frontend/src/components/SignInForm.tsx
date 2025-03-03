@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Input from "./Input";
 import PasswordInput from "./PasswordInput";
 import TextLink from "./TextLink";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from 'react-router-dom';
 
 const SignInForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+    const navigate = useNavigate();
+
+    const { login } = useContext(AuthContext);
     
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       console.log('Sign In:', { email, password, rememberMe });
-      // Add your authentication logic here
+      await login(email, password);
+      navigate('/');
     };
     
     return (

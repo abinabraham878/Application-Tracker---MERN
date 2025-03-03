@@ -1,32 +1,44 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
 import PasswordInput from "./PasswordInput";
 import TextLink from "./TextLink";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const SignUpForm = () => {
-    const [fullName, setFullName] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreeTerms, setAgreeTerms] = useState(false);
+    const navigate = useNavigate();
+
+    const { register } = useContext(AuthContext);
     
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log('Sign Up:', { fullName, email, password, confirmPassword, agreeTerms });
+      console.log('Sign Up:', { name, email, password, confirmPassword, agreeTerms });
+      if (password !== confirmPassword) {
+        // Handle password mismatch
+        alert('Passwords do not match');
+        return;
+      }
       // Add your registration logic here
+      await register(name, email, password);
+      navigate('/');
     };
     
     return (
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
         <div className="space-y-4">
           <Input
-            id="fullName"
-            name="fullName"
+            id="name"
+            name="name"
             type="text"
             label="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
             autoComplete="name"
           />
