@@ -1,30 +1,28 @@
-# Node modules
-node_modules/
-npm-debug.log
-
-# Environment variables
-/config/config.env
-
 # Logs
-logs/
+logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Database and generated files
-*.sqlite
-*.sqlite3
-*.csv
-*.json
+node_modules
+package-lock.json
+dist
+dist-ssr
+*.local
 
-# Ignore build files
-dist/
-build/
-
-# Ignore test coverage
-coverage/
-
-# Ignore VS Code settings
-.vscode/
-
-# Ignore OS-specific files
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment
+config/config.env
