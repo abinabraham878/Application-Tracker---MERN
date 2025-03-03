@@ -1,0 +1,31 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn.lock
+
+# Environment variables
+/config/config.env
+
+# Logs
+logs/
+*.log
+
+# Database and generated files
+*.sqlite
+*.sqlite3
+*.csv
+*.json
+
+# Ignore build files
+dist/
+build/
+
+# Ignore test coverage
+coverage/
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
