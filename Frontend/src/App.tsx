@@ -5,6 +5,7 @@ import JobTracker from "./pages/JobTracker";
 import { AuthProvider } from "./context/AuthContext";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfilePage from "./pages/ProfilePage";
 function App() {
   return (
     <AuthProvider>
@@ -26,6 +27,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
     </AuthProvider>
   );
