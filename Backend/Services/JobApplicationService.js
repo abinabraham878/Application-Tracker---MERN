@@ -5,8 +5,8 @@ const jobApplicationSchema = require('../models/JobApplication');
 const createJobApplication = async (req, res, next) => {
 
     try{
-        const { jobTitle, companyName, jobLocation, jobType, usedResume, usedCoverLetter, status} = req.body;
-        const jobApplication = await jobApplicationSchema.create({ jobTitle, companyName, jobLocation, jobType, usedResume, usedCoverLetter, status });
+        const { jobTitle, companyName, jobLocation, jobType, usedResume, usedCoverLetter, status, userId} = req.body;
+        const jobApplication = await jobApplicationSchema.create({ jobTitle, companyName, jobLocation, jobType, usedResume, usedCoverLetter, status, userId });
         res.status(201).json(jobApplication);
     } catch (error) {
         next(error);
@@ -17,7 +17,7 @@ const createJobApplication = async (req, res, next) => {
 // Get all job applications
 const getAllJobApplications = async (req, res, next) => {
     try {
-        const jobApplications = await jobApplicationSchema.find({});
+        const jobApplications = await jobApplicationSchema.find({ userId: req.params.userId });
         res.status(200).json(jobApplications);
     } catch (error) {
         next(error);
