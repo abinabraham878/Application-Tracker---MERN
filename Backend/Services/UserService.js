@@ -8,7 +8,7 @@ const register = async (req, res, next) => {
 
     try{
         const user = await User.create({ name, email, password });
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_Expiry });
+        const token = jwt.sign({ userId: user._id, userName: user.name }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_Expiry });
 
         res.status(201).json({ success: true, message: "Registration Successful", token });
     } catch(err){
@@ -38,11 +38,19 @@ const login = async (req, res, next) => {
             return res.status(401).json({ success: false, message: "Incorrect password" });
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_Expiry });
+        const token = jwt.sign({ userId: user._id, userName: user.name }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_Expiry });
         res.status(200).json({ success: true, message: "Login Successful", token });
     } catch(err){
         res.status(500).json({ success: false, message: "Server Error" });
     }
-}
+};
 
-module.exports = { register, login };
+const getUserById = async (req, res, next) => {
+    const user = await User.findOne({_id: req.params.id});
+    if(!user){
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, user });
+}; 
+
+module.exports = { register, login, getUserById };
