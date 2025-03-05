@@ -18,7 +18,6 @@ const SignUpForm = () => {
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log('Sign Up:', { name, email, password, confirmPassword, agreeTerms });
       if (password !== confirmPassword) {
         // Handle password mismatch
         alert('Passwords do not match');

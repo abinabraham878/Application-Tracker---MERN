@@ -1,5 +1,5 @@
 interface SelectAtomProps {
-    label: string;
+    label: any;
     name: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -20,7 +20,7 @@ const Select: React.FC<SelectAtomProps> = ({
             htmlFor={name}
             className="block text-gray-700 text-sm font-bold mb-2"
         >
-            {label}
+            {label} {required && <span className="text-red-500">*</span>}
         </label>
         <select
             id={name}

@@ -26,7 +26,7 @@ const Input = ({
     return (
       <div>
         <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-          {label}
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
         <input
           id={id}
