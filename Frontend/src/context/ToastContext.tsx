@@ -41,7 +41,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
                     >
                         {toast.message}
                     </div>
-                ))};
+                ))}
             </div>
         </ToastContext.Provider>
     );
