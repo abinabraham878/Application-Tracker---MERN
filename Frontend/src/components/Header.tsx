@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { CircleUserRound, LogOut, PlusSquare } from 'lucide-react';
 
-const Header = ({ isExpanded }: { isExpanded: boolean }) => {
+const Header = ({ handleOpenModal }: { handleOpenModal: () => void }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +36,7 @@ const Header = ({ isExpanded }: { isExpanded: boolean }) => {
       <h1 className="text-xl font-bold">Application Board</h1>
 
       <div className="flex items-center gap-4">
-        <button className="px-4 py-2 bg-blue-500 text-white rounded flex items-center cursor-pointer hover:bg-blue-600">
+        <button className="px-4 py-2 bg-blue-500 text-white rounded flex items-center cursor-pointer hover:bg-blue-600" onClick={handleOpenModal}>
           <PlusSquare size={16} className="mr-2" />
           <span>Add New Application</span>
         </button>

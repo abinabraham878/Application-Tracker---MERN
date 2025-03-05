@@ -1,12 +1,24 @@
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Sidebar from '../components/Sidebar';
 import Layout from '../components/Layout';
 import StatusBoard from '../components/StatusBoard';
 import { CheckCircle, FileText, Users } from 'lucide-react';
+import Modal from '../components/Modal';
+import JobApplicationForm from './JobApplicationForm';
 
 const JobTracker = () => {
     const [isExpanded, setisExpanded] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const childRef = useRef<any>(null);
+
+    const handleOpenModal = () => {
+      setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+    };
 
     const toggleSidebar = () => {
       setisExpanded(!isExpanded);
@@ -58,8 +70,18 @@ const JobTracker = () => {
     return (
       <>
         <Sidebar isExpanded={isExpanded} toggleSidebar={toggleSidebar} />
-        <Layout isExpanded={isExpanded}>
+        <Layout isExpanded={isExpanded} handleOpenModal={handleOpenModal}>
           <StatusBoard statusData={statusData} />
+          <Modal
+           isOpen={isModalOpen}
+           onClose={handleCloseModal}
+           title="Add New Job Application"
+           showSaveBtn={true}
+           saveButtonText="Save Job Application"
+           onSubmitClicked={() => childRef.current?.submit()}
+           >
+            <JobApplicationForm ref={childRef} onClose={handleCloseModal} />
+          </Modal>
         </Layout>
       </>
     );
