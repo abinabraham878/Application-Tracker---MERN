@@ -7,17 +7,17 @@ const createJobApplication = async (req, res, next) => {
     try{
         const { jobTitle, companyName, jobLocation, jobType, usedResume, usedCoverLetter, status, userId} = req.body;
         const jobApplication = await jobApplicationSchema.create({ jobTitle, companyName, jobLocation, jobType, usedResume, usedCoverLetter, status, userId });
-        res.status(201).json(jobApplication);
+        res.status(201).json({ success: true, data: jobApplication});
     } catch (error) {
         next(error);
-        res.status(500).json({message: error.message});
+        res.status(500).json({ success: false ,message: error.message});
     }
 };
 
 // Get all job applications
 const getAllJobApplications = async (req, res, next) => {
     try {
-        const jobApplications = await jobApplicationSchema.find({ userId: req.params.userId });
+        const jobApplications = await jobApplicationSchema.find({ userId: req.params.id });
         res.status(200).json(jobApplications);
     } catch (error) {
         next(error);
