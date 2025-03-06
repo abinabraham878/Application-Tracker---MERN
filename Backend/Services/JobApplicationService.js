@@ -17,7 +17,7 @@ const createJobApplication = async (req, res, next) => {
 // Get all job applications
 const getAllJobApplications = async (req, res, next) => {
     try {
-        const jobApplications = await jobApplicationSchema.find({ userId: req.params.id });
+        const jobApplications = await jobApplicationSchema.find({ userId: req.params.id }).sort({createdAt: -1});
         res.status(200).json(jobApplications);
     } catch (error) {
         next(error);
