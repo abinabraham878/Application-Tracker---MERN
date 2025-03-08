@@ -33,7 +33,7 @@ instance.interceptors.response.use(
             // Clear token and redirect to login
             localStorage.removeItem('token');
             localStorage.removeItem('userName');
-            window.location.href = '/login';
+            window.location.href = '/auth';
         }
         return Promise.reject(error);
     }
