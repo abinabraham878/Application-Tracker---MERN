@@ -17,6 +17,7 @@ const authenticate = async (req, res, next) => {
         req.user = user;
         next();
     } catch(err){
+        console.log(err)
         res.status(500).json({ success: false, message: "Server Error" });
     }
 };

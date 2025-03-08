@@ -23,7 +23,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
         setTimeout(() => {
             setToasts((prevToasts) => prevToasts.filter((t) => t.id !== newToast.id))
-        }, 3000)
+        }, 6000)
     };
 
     return (
@@ -41,17 +41,8 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
                     >
                         {toast.message}
                     </div>
-                ))};
+                ))}
             </div>
         </ToastContext.Provider>
     );
 };
-
-export const useToast = () => {
-    const context = useContext(ToastContext);
-    if (!context) {
-        throw new Error("useToast must be used within a ToastProvider");
-    }
-    return context;
-};
-

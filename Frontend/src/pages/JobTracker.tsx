@@ -6,6 +6,7 @@ import StatusBoard from '../components/StatusBoard';
 import { CheckCircle, FileText, Users } from 'lucide-react';
 import Modal from '../components/Modal';
 import JobApplicationForm from './JobApplicationForm';
+import JobApplicationTable from './JobApplicationTable';
 
 const JobTracker = () => {
     const [isExpanded, setisExpanded] = useState(false);
@@ -72,6 +73,7 @@ const JobTracker = () => {
         <Sidebar isExpanded={isExpanded} toggleSidebar={toggleSidebar} />
         <Layout isExpanded={isExpanded} handleOpenModal={handleOpenModal}>
           <StatusBoard statusData={statusData} />
+          <JobApplicationTable />
           <Modal
            isOpen={isModalOpen}
            onClose={handleCloseModal}

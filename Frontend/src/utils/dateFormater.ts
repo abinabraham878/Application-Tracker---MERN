@@ -1,5 +1,11 @@
 export function formatDate(dateStr: string): string {
-    const [day, month, year] = dateStr.split('/').map(Number);
-    const date = new Date(year, month - 1, day);
-    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+    // Create a Date object from the ISO string
+  const date = new Date(dateStr);
+  
+  // Format the date using Intl.DateTimeFormat for localization
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date);
 }

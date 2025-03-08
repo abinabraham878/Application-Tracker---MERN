@@ -5,9 +5,11 @@ import SignInForm from "../components/SignInForm";
 import SignUpForm from "../components/SignUpForm";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ForgotPassword from "./ForgotPassword";
 
 const AuthPage = () => {
     const [isSignIn, setIsSignIn] = useState(true);
+    const [isForgotPasswordClicked, setIsForgotPasswordClicked] = useState(false);
     const navigate = useNavigate();
     
     const toggleForm = () => {
@@ -16,15 +18,17 @@ const AuthPage = () => {
     
     return (
       <AuthLayout
-        title={isSignIn ? 'Sign In' : 'Create Account'}
+        title={isForgotPasswordClicked ? 'Forgot Your Password?' : (isSignIn ? 'Sign In' : 'Create Account')}
         subtitle={
-          isSignIn
+          isForgotPasswordClicked ? 'Reset your password securely and regain access to your account.' :
+          (isSignIn
             ? 'Welcome back! Please sign in to continue.'
             : 'Fill out the form below to create your account.'
+          )
         }
       >
-        {isSignIn ? <SignInForm /> : <SignUpForm />}
-        <FormToggleLink isSignIn={isSignIn} onClick={toggleForm} />
+        { isForgotPasswordClicked ? <ForgotPassword setIsForgotPasswordClicked={setIsForgotPasswordClicked} /> : (isSignIn ? <SignInForm isForgotPasswordClicked={isForgotPasswordClicked} setIsForgotPasswordClicked={setIsForgotPasswordClicked} /> : <SignUpForm />)}
+        { !isForgotPasswordClicked && <FormToggleLink isSignIn={isSignIn} onClick={toggleForm}  />}
       </AuthLayout>
     );
   };

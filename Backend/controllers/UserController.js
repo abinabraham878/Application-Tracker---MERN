@@ -1,4 +1,4 @@
-const { register, login, getUserById } = require('../Services/UserService');
+const { register, login, getUserById, forgotPassword } = require('../Services/UserService');
 
 // Register a new user
 const registerNewUser = (req, res, next) => {
@@ -15,4 +15,9 @@ const getUser = (req, res, next) => {
     return getUserById(req, res, next);
 };
 
-module.exports = { registerNewUser, userLogin, getUser };
+//forgot password
+const forgotPass = (req, res, next) => {
+    return forgotPassword(req, res, next);
+};
+
+module.exports = { registerNewUser, userLogin, getUser, forgotPass };
