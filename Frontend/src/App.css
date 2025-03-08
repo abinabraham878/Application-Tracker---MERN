@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9; /* light gray that matches your theme */
+    border-radius: 0 0 8px 0;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c1c1c1; /* dark blue color that matches your sidebar */
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2563eb; /* slightly lighter blue for hover state */
+  }
+  
+  /* For Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f5f9;
+  }
