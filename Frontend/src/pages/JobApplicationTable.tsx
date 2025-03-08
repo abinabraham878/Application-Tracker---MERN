@@ -1,18 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import Table from "../components/Table"
-import axios from "../services/axios";
-import { AuthContext } from "../context/AuthContext";
-import { ToastContext } from "../context/ToastContext";
+import { JobTrackerContext } from "../context/JobTrackerContext";
 
-interface JobApplication {
-    _id: string;
-    jobTitle: string;
-    companyName: string;
-    jobLocation: string;
-    jobType: string;
-    status: string;
-    createdAt: string;
-  }
 
 const JobApplicationTable = () => {
 
@@ -25,21 +14,10 @@ const JobApplicationTable = () => {
         { title: "Created At", key: "createdAt" },
     ]);
 
-    const { user } = useContext(AuthContext);
-    const { addToast } = useContext(ToastContext);
-    const [ applications, setApplications ] = useState<JobApplication[]>([]);
+    const { applications, getAllApplications } = useContext(JobTrackerContext);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get("/api/job-application/all/" + user?.userId);
-                setApplications(response.data);
-            } catch (error) {
-                addToast("error", "Error fetching job applications");
-            }
-        };
-
-        fetchData();
+        getAllApplications();
     }, [])
 
   return (

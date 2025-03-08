@@ -7,7 +7,7 @@ import TextLink from "./TextLink";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
 
-const SignInForm = () => {
+const SignInForm = ({ setIsForgotPasswordClicked}: any) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
@@ -19,6 +19,10 @@ const SignInForm = () => {
       e.preventDefault();
       await login(email, password);
       navigate('/');
+    };
+
+    const handleForgotPassword =() =>{
+      setIsForgotPasswordClicked(true);
     };
     
     return (
@@ -53,7 +57,7 @@ const SignInForm = () => {
             />
             
             <div className="text-sm">
-              <TextLink href="#">Forgot password?</TextLink>
+              <TextLink onClick={handleForgotPassword}>Forgot password?</TextLink>
             </div>
           </div>
         </div>

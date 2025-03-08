@@ -1,8 +1,9 @@
 
 import axios from "../services/axios";
 import { jwtDecode } from "jwt-decode";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContext } from "./ToastContext";
 
 type User = {
   userId: string;
@@ -20,6 +21,7 @@ interface AuthContextType {
   getUserInitials: () => string;
   getUserDetails: () => Promise<void>;
   userDetails: any | null;
+  resetPassword: (email: string, password: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +33,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+
+  const { addToast } = useContext(ToastContext);
 
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -91,12 +95,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser({ userId: decodedToken.userId });
         localStorage.setItem('userName', response.data.userName);
         setUserName(response.data.userName);
+        
       } else {
         throw new Error(response.data.message || 'Login failed');
       }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Something went wrong during login');
-      console.error('Login error:', error);
+    } catch (error: any) {
+      addToast("error", error.response ? error.response.data.message : 'Something went wrong during login. Please contact admin');
+      console.log('Login error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -180,6 +185,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     
   };
 
+  const resetPassword = async(email: string, password: string) => {
+    try{
+
+      const response = await axios.post('/api/user/forgotPassword', { email, password });
+      if (response.data.success) {
+        addToast("success", "Password updated successfully");
+      }
+    } catch(error: any) {
+      addToast("error", error instanceof Error ? error.message : 'Something went wrong while reseting password. Please contact admin');
+    }
+  }
+
 
   return (
     <AuthContext.Provider value={{
@@ -193,7 +210,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated,
       getUserInitials,
       getUserDetails,
-      userDetails
+      userDetails,
+      resetPassword
     }}>
       {children}
     </AuthContext.Provider>

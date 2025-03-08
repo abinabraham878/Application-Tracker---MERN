@@ -4,6 +4,7 @@ import Select from "../components/Select";
 import { AuthContext } from "../context/AuthContext";
 import { ToastContext, useToast } from "../context/ToastContext";
 import axios from "../services/axios";
+import { JobTrackerContext } from "../context/JobTrackerContext";
 
 // Define form fields using JSON to avoid repetition
 const formFields = [
@@ -34,6 +35,8 @@ const JobApplicationForm = forwardRef(({ onClose }: any, ref) => {
     const { user } = useContext(AuthContext);
     const { addToast } = useContext(ToastContext);
 
+    const { saveJobApplication } = useContext(JobTrackerContext);
+
     const [formData, setFormData] = useState<any>(() =>
         formFields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), { status: "Sent Application" })
     );
@@ -42,7 +45,8 @@ const JobApplicationForm = forwardRef(({ onClose }: any, ref) => {
 
     useImperativeHandle(ref, () => ({
         submit() {
-            handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>);
+            // handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>);
+            saveJobApplication(formData);
         }
     }));
 

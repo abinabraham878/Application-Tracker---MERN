@@ -11,7 +11,7 @@ const FormToggleLink = ({ isSignIn, onClick }: FormToggleLinkProps) => {
           {isSignIn ? "Don't have an account? " : "Already have an account? "}
           <button 
             onClick={onClick}
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
           >
             {isSignIn ? 'Sign Up' : 'Sign In'}
           </button>

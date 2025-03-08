@@ -23,7 +23,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
         setTimeout(() => {
             setToasts((prevToasts) => prevToasts.filter((t) => t.id !== newToast.id))
-        }, 3000)
+        }, 6000)
     };
 
     return (
