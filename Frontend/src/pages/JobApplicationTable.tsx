@@ -6,12 +6,12 @@ import { JobTrackerContext } from "../context/JobTrackerContext";
 const JobApplicationTable = ({ setIsActionClicked }: any) => {
 
     const [tableColumns] = useState([
-        { title: "Job Title", key: "jobTitle" },    
-        { title: "Company Name", key: "companyName" },
-        { title: "Job Location", key: "jobLocation" },
-        { title: "Job Type", key: "jobType" },
-        { title: "Status", key: "status" },
-        { title: "Created At", key: "createdAt" },
+        { title: "Job Title", key: "jobTitle", filter: false },    
+        { title: "Company Name", key: "companyName", filter: true },
+        { title: "Job Location", key: "jobLocation", filter: false },
+        { title: "Job Type", key: "jobType", filter: false },
+        { title: "Status", key: "status", filter: true },
+        { title: "Created At", key: "createdAt", filter: false },
     ]);
 
     const onActionBtnCLicked = () =>{

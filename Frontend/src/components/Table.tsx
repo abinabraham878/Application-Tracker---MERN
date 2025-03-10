@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { formatDate } from "../utils/dateFormater";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Filter } from "lucide-react";
 
 interface TableProps {
   columns: {
     title: string;
     key: string;
+    filter: boolean;
   }[];
   rowData: any[];
   maxHeight?: string;
@@ -30,16 +31,24 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
     setActiveOptionMenu(null);
   };
 
+  // Calculate grid columns based on the number of columns + 1 for actions
+  const gridCols = `grid-cols-${columns.length + 1}`;
+
   return (
     <div className="mx-6 mt-6 mb-6">
       {/* Column Headers - Fixed */}
-      <div className="bg-gray-50 p-4 grid grid-cols-7 border-b border-gray-200">
+      <div className={`bg-gray-50 p-4 grid ${gridCols} border-b border-gray-200`}>
         {columns.map((column, index) => (
-          <div key={index} className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center">
+          <div key={index} className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center flex items-center justify-center">
             {column.title}
+            {column.filter && (
+              <span className="ml-1">
+                <Filter size={16} className="text-gray-400" />
+              </span>
+            )}
           </div>
         ))}
-        <div className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center w-auto">
+        <div className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center">
           ACTIONS
         </div>
       </div>
@@ -55,7 +64,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
         {rowData.map((row, rowIndex) => (
           <div 
             key={rowIndex} 
-            className={`grid grid-cols-7 py-4 px-6 ${
+            className={`grid ${gridCols} py-4 px-6 ${
               rowIndex !== rowData.length - 1 ? 'border-b border-gray-200' : ''
             } hover:bg-gray-50 transition-all`}
           >
@@ -74,7 +83,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
             ))}
 
             {/* Options Menu Icon */}
-            <div className="flex justify-end items-center relative w-auto">
+            <div className="flex justify-center items-center relative">
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
