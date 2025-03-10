@@ -1,15 +1,12 @@
 import { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import Input from "../components/Input";
 import Select from "../components/Select";
-import { AuthContext } from "../context/AuthContext";
-import { ToastContext, useToast } from "../context/ToastContext";
-import axios from "../services/axios";
+import { ToastContext } from "../context/ToastContext";
 import { JobTrackerContext } from "../context/JobTrackerContext";
 
 
 
 const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
-    const { user } = useContext(AuthContext);
     const { addToast } = useContext(ToastContext);
 
     const { saveJobApplication } = useContext(JobTrackerContext);
@@ -22,8 +19,7 @@ const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
 
     useImperativeHandle(ref, () => ({
         submit() {
-            // handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>);
-            saveJobApplication(formData);
+            handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>);
         }
     }));
 
@@ -52,19 +48,13 @@ const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
         if (!validateForm()) return;
 
         try {
-            const submitData = { ...formData, userId: user?.userId };
-
-            const response = await axios.post('/api/job-application/create', submitData);
-            if (response.data.success) {
-                addToast("success", "Job application submitted successfully");
-                // Reset form after submission
-                setFormData(() =>
+            await saveJobApplication(formData);
+            setFormData(() =>
                     formFields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), { status: "Sent Application" })
                 );
 
                 onClose();
-            }
-
+            
         } catch (error: any) {
             console.error("Error submitting job application:", error);
 
