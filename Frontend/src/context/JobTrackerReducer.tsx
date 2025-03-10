@@ -8,6 +8,7 @@ type State = {
 
 type Action = 
   | { type: "GET_ALL_APPLICATIONS"; payload: JobApplication[] }
+  | { type: "SAVE_JOB_APPLICATION"; payload: JobApplication}
   | { type: "ERROR"; payload: string };
 
 const JobTrackerReducer = (state: State, action: Action): State => {
@@ -18,6 +19,11 @@ const JobTrackerReducer = (state: State, action: Action): State => {
         applications: action.payload,
         loading: false,
       };
+    case "SAVE_JOB_APPLICATION":
+      return {
+        ...state,
+        applications: [action.payload, ...state.applications],
+      }
     case "ERROR":
       return {
         ...state,

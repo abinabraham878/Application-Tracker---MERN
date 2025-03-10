@@ -12,6 +12,7 @@ export interface JobApplication {
     jobType: string;
     status: string;
     createdAt: string;
+    userId: string;
 }
 
 const initialState: { applications: JobApplication[], error: null | string, loading: boolean } = {
@@ -52,6 +53,24 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
 
     const saveJobApplication = async (data: JobApplication) => {
         console.log("Saving job application", data);
+        try {
+
+            data = {
+                ...data,
+                userId: user?.userId,
+            }
+
+            const response = await axios.post('/api/job-application/create', data);
+            if (response.data.success) {
+                addToast("success", "Job application submitted successfully");
+                dispatch({
+                    type: "SAVE_JOB_APPLICATION",
+                    payload: response.data.data
+                })
+            }
+        } catch (error){
+            addToast("error", "Error saving job application");
+        } 
     }
     
     return (
