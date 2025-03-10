@@ -28,7 +28,7 @@ const Select: React.FC<SelectAtomProps> = ({
             value={value}
             onChange={onChange}
             required={required}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-[100%] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         >
             <option value="">Select {label}</option>
             {options.map((option) => (

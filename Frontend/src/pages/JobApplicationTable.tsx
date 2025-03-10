@@ -3,7 +3,7 @@ import Table from "../components/Table"
 import { JobTrackerContext } from "../context/JobTrackerContext";
 
 
-const JobApplicationTable = () => {
+const JobApplicationTable = ({ setIsActionClicked }: any) => {
 
     const [tableColumns] = useState([
         { title: "Job Title", key: "jobTitle" },    
@@ -14,14 +14,25 @@ const JobApplicationTable = () => {
         { title: "Created At", key: "createdAt" },
     ]);
 
+    const onActionBtnCLicked = () =>{
+
+    };
+
+    const actionBUttons = [
+      {
+        buttonName: 'Change Status',
+        onClick: onActionBtnCLicked
+      }
+    ];
+
     const { applications, getAllApplications } = useContext(JobTrackerContext);
 
     useEffect(() => {
         getAllApplications();
-    }, [])
+    }, []);
 
   return (
-    <Table columns={tableColumns} rowData={applications}/>
+    <Table columns={tableColumns} rowData={applications} setIsActionClicked={setIsActionClicked}/>
   )
 }
 
