@@ -10,41 +10,65 @@ interface TableProps {
   }[];
   rowData: any[];
   maxHeight?: string;
-  setIsActionClicked: (arg:boolean) => void;
+  setIsActionClicked: (arg: boolean) => void;
   setRowDataId: (arg: string) => void;
+  fetchData: (filters?: FilterPayload[]) => Promise<any>;
+  loading: boolean;
 }
 
-const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", setIsActionClicked, setRowDataId }) => {
+interface FilterPayload {
+  columnName: string;
+  value: string[];
+  operation: string;
+}
 
+const Table: React.FC<TableProps> = ({ 
+  columns, 
+  rowData = [], // Default to empty array to prevent null errors
+  maxHeight = "400px", 
+  setIsActionClicked, 
+  setRowDataId, 
+  fetchData,
+  loading
+}) => {
   const [activeOptionMenu, setActiveOptionMenu] = useState<number | null>(null);
   const [activeFilterColumn, setActiveFilterColumn] = useState<string | null>(null);
   const [filterValues, setFilterValues] = useState<{[key: string]: string[]}>({});
   const [selectedFilters, setSelectedFilters] = useState<{[key: string]: string[]}>({});
+  const [appliedFilters, setAppliedFilters] = useState<{[key: string]: string[]}>({});
   
   const filterPopoverRef = useRef<HTMLDivElement>(null);
 
   // Initialize filter values from row data
   useEffect(() => {
+    // Store original filter values to use when resetting
     const newFilterValues: {[key: string]: string[]} = {};
     
     columns.forEach(column => {
       if (column.filter) {
-        // Get unique values for this column
-        const uniqueValues = Array.from(new Set(rowData.map(row => row[column.key])));
+        // Get unique values for this column, handling nulls and undefined
+        const uniqueValues = Array.from(new Set(
+          rowData
+            .filter(row => row && row[column.key] !== undefined && row[column.key] !== null)
+            .map(row => row[column.key].toString())
+        ));
         newFilterValues[column.key] = uniqueValues as string[];
       }
     });
     
     setFilterValues(newFilterValues);
     
-    // Initialize selected filters with empty arrays
-    const initialSelectedFilters: {[key: string]: string[]} = {};
-    columns.forEach(column => {
-      if (column.filter) {
-        initialSelectedFilters[column.key] = [];
-      }
-    });
-    setSelectedFilters(initialSelectedFilters);
+    // Only initialize selected filters if they haven't been set yet
+    if (Object.keys(selectedFilters).length === 0) {
+      const initialSelectedFilters: {[key: string]: string[]} = {};
+      columns.forEach(column => {
+        if (column.filter) {
+          initialSelectedFilters[column.key] = [];
+        }
+      });
+      setSelectedFilters(initialSelectedFilters);
+      setAppliedFilters(initialSelectedFilters);
+    }
   }, [columns, rowData]);
 
   const handleOptionClick = (rowIndex: number) => {
@@ -53,7 +77,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
     } else {
       setActiveOptionMenu(rowIndex);
     }
-    setActiveFilterColumn(null); // Close any open filter when opening option menu
+    setActiveFilterColumn(null);
   };
 
   const handleFilterClick = (e: React.MouseEvent, columnKey: string) => {
@@ -62,11 +86,16 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
       setActiveFilterColumn(null);
     } else {
       setActiveFilterColumn(columnKey);
-      setActiveOptionMenu(null); // Close any open option menu when opening filter
+      setActiveOptionMenu(null);
+      
+      // When opening a filter, make the selectedFilters match the appliedFilters
+      setSelectedFilters(prev => ({
+        ...prev,
+        [columnKey]: [...(appliedFilters[columnKey] || [])]
+      }));
     }
   };
 
-  // Close popups when clicking outside
   const handleClickOutside = (e: React.MouseEvent) => {
     if (filterPopoverRef.current && !filterPopoverRef.current.contains(e.target as Node)) {
       setActiveFilterColumn(null);
@@ -74,10 +103,9 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
     setActiveOptionMenu(null);
   };
 
-  // Toggle a filter value selection
   const toggleFilterValue = (columnKey: string, value: string) => {
     setSelectedFilters(prev => {
-      const current = [...prev[columnKey]];
+      const current = [...(prev[columnKey] || [])]; // Add fallback for empty arrays
       const index = current.indexOf(value);
       
       if (index === -1) {
@@ -93,7 +121,6 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
     });
   };
 
-  // Reset filters for a column
   const resetFilters = (columnKey: string) => {
     setSelectedFilters(prev => ({
       ...prev,
@@ -101,28 +128,65 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
     }));
   };
 
-  // Apply filters to row data
-  const filteredData = rowData.filter(row => {
+  const resetAllFilters = async () => {
+    const resetFilters: {[key: string]: string[]} = {};
+    Object.keys(selectedFilters).forEach(key => {
+      resetFilters[key] = [];
+    });
+    
+    setSelectedFilters(resetFilters);
+    setAppliedFilters(resetFilters);
+    
+    try {
+      await fetchData();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const applyFilters = async () => {
+    const filterPayload: FilterPayload[] = [];
+    
+    // Update appliedFilters to match selectedFilters
+    setAppliedFilters({...selectedFilters});
+    
     for (const [key, values] of Object.entries(selectedFilters)) {
-      if (values.length > 0 && !values.includes(row[key])) {
-        return false;
+      if (values && values.length > 0) {
+        filterPayload.push({
+          columnName: key,
+          value: values,
+          operation: "in"
+        });
       }
     }
-    return true;
-  });
+    
+    try {
+      await fetchData(filterPayload.length > 0 ? filterPayload : undefined);
+      setActiveFilterColumn(null);
+    } catch (error) {
+      console.error("Error applying filters:", error);
+    }
+  };
 
-  // Calculate grid columns based on the number of columns + 1 for actions
   const gridCols = `grid-cols-${columns.length + 1}`;
 
-  // Get active column title
   const getActiveColumnTitle = () => {
     if (!activeFilterColumn) return "";
     const column = columns.find(col => col.key === activeFilterColumn);
     return column ? column.title : "";
   };
 
+  const hasActiveFilters = () => {
+    return Object.values(appliedFilters).some(values => values && values.length > 0);
+  };
+
+  // Function to check if a column has active filters
+  const hasColumnActiveFilters = (columnKey: string) => {
+    return appliedFilters[columnKey] && appliedFilters[columnKey].length > 0;
+  };
+
   return (
-    <div className="mx-6 mt-6 mb-6">
+    <div className="mx-6 mt-6 mb-6 rounded-lg shadow-md">
       {/* Column Headers - Fixed */}
       <div className={`bg-gray-50 p-4 grid ${gridCols} border-b border-gray-200`}>
         {columns.map((column, index) => (
@@ -132,7 +196,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
               <button 
                 onClick={(e) => handleFilterClick(e, column.key)}
                 className={`ml-1 p-1 rounded hover:bg-gray-200 focus:outline-none flex items-center justify-center ${
-                  selectedFilters[column.key]?.length > 0 ? 'text-blue-500' : 'text-gray-400'
+                  hasColumnActiveFilters(column.key) ? 'text-blue-500' : 'text-gray-400'
                 }`}
               >
                 <Filter size={16} />
@@ -195,7 +259,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
                   </button>
                   <button 
                     className="text-sm text-blue-500 hover:text-blue-700 font-medium"
-                    onClick={() => setActiveFilterColumn(null)}
+                    onClick={applyFilters}
                   >
                     Apply
                   </button>
@@ -204,10 +268,25 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
             )}
           </div>
         ))}
-        <div className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center">
+        <div className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center flex items-center justify-center relative">
           ACTIONS
         </div>
       </div>
+      
+      {/* Filter indicator and reset button */}
+      {hasActiveFilters() && (
+        <div className="bg-blue-50 px-4 py-2 flex justify-between items-center border-b border-blue-100">
+          <span className="text-sm text-blue-700">
+            Showing filtered results
+          </span>
+          <button
+            onClick={resetAllFilters}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            Reset all filters
+          </button>
+        </div>
+      )}
       
       {/* Table Body - Scrollable with max height */}
       <div 
@@ -217,22 +296,39 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
         }}
         onClick={handleClickOutside}
       >
-        {rowData.length === 0 ? (
+        {loading ? (
+          <div className="py-12 text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading data...</p>
+          </div>
+        ) : rowData?.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-gray-400 mb-2">
               <span className="block text-4xl mb-2">📋</span>
-              <h3 className="text-lg font-medium text-gray-600">No jobs added yet</h3>
+              <h3 className="text-lg font-medium text-gray-600">
+                {hasActiveFilters() ? "No matching results" : "No jobs added yet"}
+              </h3>
             </div>
             <p className="text-gray-500 text-sm max-w-xs mx-auto">
-              Start by adding your first job application to begin tracking your job search progress.
+              {hasActiveFilters() 
+                ? "Try adjusting your filters or reset them to see all jobs."
+                : "Start by adding your first job application to begin tracking your job search progress."}
             </p>
+            {hasActiveFilters() && (
+              <button 
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                onClick={resetAllFilters}
+              >
+                Reset all filters
+              </button>
+            )}
           </div>
-        ) : filteredData.length > 0 ? (
-          filteredData.map((row, rowIndex) => (
+        ) : (
+          rowData.map((row, rowIndex) => (
             <div 
               key={rowIndex} 
               className={`grid ${gridCols} py-4 px-6 ${
-                rowIndex !== filteredData.length - 1 ? 'border-b border-gray-200' : ''
+                rowIndex !== rowData.length - 1 ? 'border-b border-gray-200' : ''
               } hover:bg-gray-50 transition-all`}
             >
               {columns.map((column, colIndex) => (
@@ -268,10 +364,9 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('View details', row);
                         setActiveOptionMenu(null);
                         setIsActionClicked(true);
-                        setRowDataId(row._id)
+                        setRowDataId(row._id);
                       }}
                     >
                       Change Status
@@ -281,30 +376,13 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
               </div>
             </div>
           ))
-        ) : (
-          <div className="py-8 text-center text-gray-500">
-            <p className="text-sm">No results found. Try adjusting your filters.</p>
-            <button 
-              className="mt-2 text-blue-500 text-sm font-medium hover:text-blue-700"
-              onClick={() => {
-                // Reset all filters
-                const resetAllFilters = {};
-                Object.keys(selectedFilters).forEach(key => {
-                  resetAllFilters[key] = [];
-                });
-                setSelectedFilters(resetAllFilters);
-              }}
-            >
-              Reset all filters
-            </button>
-          </div>
         )}
       </div>
     </div>
   );
 };
 
-// Helper function to determine status tag color based on your card design
+// Helper function to determine status tag color
 const getStatusColorClass = (status: string) => {
   switch (status) {
     case "Sent Application":

@@ -17,21 +17,26 @@ const JobTrackerReducer = (state: State, action: Action): State => {
     case "GET_ALL_APPLICATIONS":
       return {
         ...state,
-        applications: action.payload,
+        applications: action.payload || [], // Ensure we have a fallback
+        error: null,
         loading: false,
       };
     case "SAVE_JOB_APPLICATION":
       return {
         ...state,
         applications: [action.payload, ...state.applications],
-      }
+        error: null,
+      };
     case "UPDATE_JOB_APPLICATION":
-      const jobIndex = state.applications.findIndex(job => job._id == action.payload._id);
-      state.applications[jobIndex] = action.payload;
+      // Create a new array to maintain immutability
+      const updatedApplications = state.applications.map(job => 
+        job._id === action.payload._id ? action.payload : job
+      );
       return {
         ...state,
-        applications: state.applications
-      }
+        applications: updatedApplications,
+        error: null,
+      };
     case "ERROR":
       return {
         ...state,

@@ -4,6 +4,7 @@ const {
   getJobApplicationById,
   updateJobApplication,
   jobApplicationStatusCount,
+  getJobApplicationsByCriteria
 } = require("../Services/JobApplicationService");
 
 // Create a new job application
@@ -31,10 +32,16 @@ const jobStatusCount = (req, res, next) => {
     return jobApplicationStatusCount(req, res, next);
 };
 
+//Get job applications by criteria
+const getJobsByCriteria = (req, res, next) => {
+  return getJobApplicationsByCriteria(req, res, next);
+};
+
 module.exports = {
   createNewJobApplication,
   getAllApplications,
   getApplicationById,
   updateApplication,
-  jobStatusCount
+  jobStatusCount,
+  getJobsByCriteria
 };
