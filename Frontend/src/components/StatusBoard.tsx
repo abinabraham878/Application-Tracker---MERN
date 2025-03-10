@@ -18,11 +18,11 @@ interface StatusBoardProps {
 
 const StatusBoard = ({ statusData }: StatusBoardProps) => {
 
-  const { jobStatusCount, statusCount } = useContext(JobTrackerContext);
-
-  useEffect(()=>{
-    jobStatusCount()
-  },[]);
+  const { jobStatusCount, statusCount, applications } = useContext(JobTrackerContext);
+    
+  useEffect(() => {
+      jobStatusCount();
+  }, [applications]);
 
 
   return (

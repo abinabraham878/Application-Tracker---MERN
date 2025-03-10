@@ -15,8 +15,9 @@ export interface JobApplication {
     userId: string;
 }
 
-const initialState: { applications: JobApplication[], error: null | string, loading: boolean } = {
+const initialState: { applications: JobApplication[], jobStatusCount: { [key: string]: number }, error: null | string, loading: boolean } = {
     applications: [],
+    jobStatusCount: {},
     error: null,
     loading: true
 };
@@ -63,6 +64,7 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
                 type: "GET_ALL_APPLICATIONS",
                 payload: response.data
             });
+            await jobStatusCount();
         } catch (error) {
             dispatch({
                 type: "ERROR",
@@ -86,6 +88,7 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
                     type: "SAVE_JOB_APPLICATION",
                     payload: response.data.data
                 });
+                await jobStatusCount();
             }
         } catch (error){
             dispatch({
@@ -109,6 +112,7 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
                     type: "UPDATE_JOB_APPLICATION",
                     payload: response.data.data
                 });
+                await jobStatusCount();
             }
         } catch(error) {
             dispatch({
@@ -123,19 +127,25 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
         try {
             const response = await axios.get('/api/job-application/status-count/'+user?.userId);
             if(response.data.data){
-                setStatusCount(response.data.data);
+                dispatch({
+                    type: "UPDATE_JOB_APPLICATION_COUNT",
+                    payload: response.data.data
+                });
             }
         } catch(error) {
             addToast("error", "Error getting job application count");
+            dispatch({
+                type: "ERROR",
+                payload: "Failed to fetch job status counts"
+            });
         }
     };
 
     const getJobApplicationByCriteria = async (filters: FilterPayload[]) => {
         try {
-            // Ensure userId filter is correctly formatted
             const userFilter = {
                 "columnName": "userId",
-                "value": [user?.userId ?? ""], // Use array format and provide fallback
+                "value": [user?.userId ?? ""],
                 "operation": "equals"
             };
             
@@ -146,8 +156,9 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
             if(response.data){
                 dispatch({
                     type: "GET_ALL_APPLICATIONS",
-                    payload: response.data.data || [] // Ensure we have a fallback
+                    payload: response.data.data || []
                 });
+                await jobStatusCount();
             }
         } catch(error) {
             dispatch({
@@ -166,7 +177,7 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
             updateJobApplication,
             setRowDataId,
             jobStatusCount,
-            statusCount,
+            statusCount: state.jobStatusCount,
             getJobApplicationByCriteria
         }}>
             {children}
