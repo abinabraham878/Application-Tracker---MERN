@@ -12,6 +12,7 @@ interface ModalProps {
   onSubmitClicked?: () => void;
   closeButtonText?: string;
   hideFooter?: boolean;
+  modalWidth?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({ 
@@ -24,7 +25,8 @@ const Modal: React.FC<ModalProps> = ({
   saveButtonText = 'Save changes',
   onSubmitClicked,
   closeButtonText = 'Close',
-  hideFooter = false
+  hideFooter = false,
+  modalWidth = '100%'
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -62,6 +64,7 @@ const Modal: React.FC<ModalProps> = ({
       {/* Modal Container */}
       <div 
         className={`
+          flex justify-center
           relative w-full max-w-4xl mx-auto my-auto transition-all duration-300 transform
           ${isVisible 
             ? 'scale-100 opacity-100' 
@@ -69,12 +72,13 @@ const Modal: React.FC<ModalProps> = ({
           }
         `}
       >
-        <div className="
-          flex flex-col w-full max-h-[90vh] 
+        <div className={`
+          flex flex-col max-h-[90vh] 
           bg-white border-2 border-blue-100 
           rounded-xl shadow-2xl 
           overflow-hidden
-        ">
+        `}
+        style={{ width: modalWidth }} >
           {/* Modal Header */}
           <div className="
             flex items-center justify-between 

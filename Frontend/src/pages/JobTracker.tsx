@@ -11,7 +11,42 @@ import JobApplicationTable from './JobApplicationTable';
 const JobTracker = () => {
     const [isExpanded, setisExpanded] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isActionCLicked, setIsActionClicked] = useState(false);
     const childRef = useRef<any>(null);
+    const formFields = [
+        { id: "jobTitle", name: "jobTitle", label: "Job Title", type: "text", required: true },
+        { id: "companyName", name: "companyName", label: "Company Name", type: "text", required: true },
+        { id: "jobLocation", name: "jobLocation", label: "Job Location", type: "text", required: true },
+        {
+            id: "jobType",
+            name: "jobType",
+            label: "Job Type",
+            type: "select",
+            required: true,
+            options: ["Full-Time", "Part-Time", "Contract", "Freelance", "Internship"]
+        },
+        { id: "usedResume", name: "usedResume", label: "Resume Used (Optional)", type: "text" },
+        { id: "usedCoverLetter", name: "usedCoverLetter", label: "Cover Letter Used (Optional)", type: "text" },
+        {
+            id: "status",
+            name: "status",
+            label: "Application Status",
+            type: "select",
+            required: true,
+            options: ["Sent Application", "Shortlisted", "Interview", "Offer", "Rejected"]
+        }
+    ];
+
+    const statusFormFields = [
+      {
+          id: "status",
+          name: "status",
+          label: "Application Status",
+          type: "select",
+          required: true,
+          options: ["Sent Application", "Shortlisted", "Interview", "Offer", "Rejected"]
+      }
+  ];
 
     const handleOpenModal = () => {
       setIsModalOpen(true);
@@ -19,6 +54,7 @@ const JobTracker = () => {
 
     const handleCloseModal = () => {
       setIsModalOpen(false);
+      setIsActionClicked(false)
     };
 
     const toggleSidebar = () => {
@@ -73,7 +109,7 @@ const JobTracker = () => {
         <Sidebar isExpanded={isExpanded} toggleSidebar={toggleSidebar} />
         <Layout isExpanded={isExpanded} handleOpenModal={handleOpenModal}>
           <StatusBoard statusData={statusData} />
-          <JobApplicationTable />
+          <JobApplicationTable setIsActionClicked={setIsActionClicked}/>
           <Modal
            isOpen={isModalOpen}
            onClose={handleCloseModal}
@@ -82,8 +118,18 @@ const JobTracker = () => {
            saveButtonText="Save Job Application"
            onSubmitClicked={() => childRef.current?.submit()}
            >
-            <JobApplicationForm ref={childRef} onClose={handleCloseModal} />
+            <JobApplicationForm ref={childRef} onClose={handleCloseModal} formFields={formFields}/>
           </Modal>
+
+          <Modal isOpen={isActionCLicked}
+           onClose={handleCloseModal}
+           title="Change Job Status"
+           showSaveBtn={true}
+           saveButtonText="Save Job Status"
+           onSubmitClicked={() => childRef.current?.submit()}
+           modalWidth='500px'>
+            <JobApplicationForm ref={childRef} onClose={handleCloseModal} formFields={statusFormFields} />
+           </Modal>
         </Layout>
       </>
     );

@@ -9,9 +9,10 @@ interface TableProps {
   }[];
   rowData: any[];
   maxHeight?: string;
+  setIsActionClicked: (arg:boolean) => void;
 }
 
-const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px" }) => {
+const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", setIsActionClicked }) => {
 
   const [activeOptionMenu, setActiveOptionMenu] = useState<number | null>(null);
 
@@ -33,11 +34,11 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px" }) 
       {/* Column Headers - Fixed */}
       <div className="bg-gray-50 p-4 grid grid-cols-7 border-b border-gray-200">
         {columns.map((column, index) => (
-          <div key={index} className="text-gray-500 text-xs font-medium uppercase tracking-wider">
+          <div key={index} className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center">
             {column.title}
           </div>
         ))}
-        <div className="text-gray-500 text-xs font-medium uppercase tracking-wider text-right">
+        <div className="text-gray-500 text-xs font-medium uppercase tracking-wider text-center w-auto">
           ACTIONS
         </div>
       </div>
@@ -58,13 +59,13 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px" }) 
             } hover:bg-gray-50 transition-all`}
           >
             {columns.map((column, colIndex) => (
-              <div key={colIndex} className="flex items-center">
+              <div key={colIndex} className="flex items-center justify-center">
                 {column.key === "status" ? (
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColorClass(row[column.key])}`}>
                     {row[column.key]}
                   </span>
                 ) : (
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 justify-center">
                     {column.key === "createdAt" ? formatDate(row[column.key]) : row[column.key]}
                   </span>
                 )}
@@ -72,7 +73,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px" }) 
             ))}
 
             {/* Options Menu Icon */}
-            <div className="flex justify-end items-center relative">
+            <div className="flex justify-end items-center relative w-auto">
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -92,29 +93,10 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px" }) 
                       e.stopPropagation();
                       console.log('View details', row);
                       setActiveOptionMenu(null);
+                      setIsActionClicked(true);
                     }}
                   >
-                    View Details
-                  </button>
-                  <button 
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      console.log('Edit', row);
-                      setActiveOptionMenu(null);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      console.log('Delete', row);
-                      setActiveOptionMenu(null);
-                    }}
-                  >
-                    Delete
+                    Change Status
                   </button>
                 </div>
               )}
