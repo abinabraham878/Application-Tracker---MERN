@@ -25,14 +25,14 @@ const JobApplicationTable = ({ setIsActionClicked }: any) => {
       }
     ];
 
-    const { applications, getAllApplications } = useContext(JobTrackerContext);
+    const { applications, getAllApplications, setRowDataId } = useContext(JobTrackerContext);
 
     useEffect(() => {
         getAllApplications();
     }, []);
 
   return (
-    <Table columns={tableColumns} rowData={applications} setIsActionClicked={setIsActionClicked}/>
+    <Table columns={tableColumns} rowData={applications} setIsActionClicked={setIsActionClicked} setRowDataId={setRowDataId}/>
   )
 }
 

@@ -40,13 +40,31 @@ const getJobApplicationById = async (req, res, next) => {
 // Update a job application
 const updateJobApplication = async (req, res, next) => {
     try {
-        const jobApplication = await jobApplicationSchema.findByIdAndUpdate(req
-            .params.id, req.body, {new: true});
-        res.status(200).json(jobApplication);
+        const jobApplication = await jobApplicationSchema.findByIdAndUpdate({_id: req
+            .params.id}, req.body, {new: true});
+        res.status(200).json({ success: true, data: jobApplication});
     }
     catch (error) {
         next(error);
-        res.status(500).json({message: error.message});
+        res.status(500).json({ success: false ,message: error.message});
+    }
+};
+
+//Get job applicaton status count
+const jobApplicationStatusCount = async (req, res, next) =>{
+    try{
+        const jobStatusCount = await jobApplicationSchema.aggregate([
+            { $match: { userId: req.params.id }},
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]);
+        const result = {};
+        jobStatusCount.forEach(item => {
+            result[item._id] = item.count
+        });
+        res.status(200).json({ success: true, data: result });
+    } catch(error) {
+        next(error);
+        res.status(500).json({ success: false ,message: error.message});
     }
 };
 
@@ -54,5 +72,6 @@ module.exports = {
     createJobApplication,
     getAllJobApplications,
     getJobApplicationById,
-    updateJobApplication
+    updateJobApplication,
+    jobApplicationStatusCount
 };

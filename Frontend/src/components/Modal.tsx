@@ -83,8 +83,9 @@ const Modal: React.FC<ModalProps> = ({
           <div className="
             flex items-center justify-between 
             p-5 border-b border-solid 
-            border-blueGray-200 
-            rounded-t-xl bg-blue-50
+            border-gray-300 
+            bg-gray-50 
+            rounded-t-xl
           ">
             <h3 className="text-xl font-semibold text-gray-800">
               {title}

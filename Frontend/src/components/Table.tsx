@@ -10,9 +10,10 @@ interface TableProps {
   rowData: any[];
   maxHeight?: string;
   setIsActionClicked: (arg:boolean) => void;
+  setRowDataId: (arg: string) => void;
 }
 
-const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", setIsActionClicked }) => {
+const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", setIsActionClicked, setRowDataId }) => {
 
   const [activeOptionMenu, setActiveOptionMenu] = useState<number | null>(null);
 
@@ -30,7 +31,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
   };
 
   return (
-    <div className="mx-6 mt-6">
+    <div className="mx-6 mt-6 mb-6">
       {/* Column Headers - Fixed */}
       <div className="bg-gray-50 p-4 grid grid-cols-7 border-b border-gray-200">
         {columns.map((column, index) => (
@@ -94,6 +95,7 @@ const Table: React.FC<TableProps> = ({ columns, rowData, maxHeight = "400px", se
                       console.log('View details', row);
                       setActiveOptionMenu(null);
                       setIsActionClicked(true);
+                      setRowDataId(row._id)
                     }}
                   >
                     Change Status
@@ -117,10 +119,14 @@ const getStatusColorClass = (status: string) => {
       return "bg-yellow-100 text-yellow-600";
     case "Interview Scheduled":
       return "bg-purple-100 text-purple-600";
+    case "Technical Interview":
+      return "bg-purple-100 text-purple-600";
     case "Final Interview":
       return "bg-orange-100 text-orange-600";
     case "Offer Confirmed":
       return "bg-green-100 text-green-600";
+    case "Rejected":
+      return "bg-red-100 text-red-600";
     default:
       return "bg-gray-100 text-gray-600";
   }

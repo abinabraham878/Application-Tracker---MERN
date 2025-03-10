@@ -9,6 +9,7 @@ type State = {
 type Action = 
   | { type: "GET_ALL_APPLICATIONS"; payload: JobApplication[] }
   | { type: "SAVE_JOB_APPLICATION"; payload: JobApplication}
+  | { type: "UPDATE_JOB_APPLICATION"; payload: JobApplication}
   | { type: "ERROR"; payload: string };
 
 const JobTrackerReducer = (state: State, action: Action): State => {
@@ -23,6 +24,13 @@ const JobTrackerReducer = (state: State, action: Action): State => {
       return {
         ...state,
         applications: [action.payload, ...state.applications],
+      }
+    case "UPDATE_JOB_APPLICATION":
+      const jobIndex = state.applications.findIndex(job => job._id == action.payload._id);
+      state.applications[jobIndex] = action.payload;
+      return {
+        ...state,
+        applications: state.applications
       }
     case "ERROR":
       return {

@@ -9,7 +9,7 @@ import { JobTrackerContext } from "../context/JobTrackerContext";
 const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
     const { addToast } = useContext(ToastContext);
 
-    const { saveJobApplication } = useContext(JobTrackerContext);
+    const { saveJobApplication, updateJobApplication } = useContext(JobTrackerContext);
 
     const [formData, setFormData] = useState<any>(() =>
         formFields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), { status: "Sent Application" })
@@ -18,8 +18,17 @@ const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     useImperativeHandle(ref, () => ({
-        submit() {
-            handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>);
+        submit(type: string) {
+            switch(type){
+                case "save": {
+                    handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>);
+                    break;
+                }
+                case "update": {
+                    handleJobUpdate();
+                    break;
+                }
+            }
         }
     }));
 
@@ -56,7 +65,6 @@ const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
                 onClose();
             
         } catch (error: any) {
-            console.error("Error submitting job application:", error);
 
             if (error?.response) {
                 const { status } = error.response;
@@ -73,6 +81,33 @@ const JobApplicationForm = forwardRef(({ onClose, formFields }: any, ref) => {
             }
         }
     };
+
+    const handleJobUpdate = async() =>{
+        if (!validateForm()) return;
+     
+        try {
+            await updateJobApplication(formData);
+            setFormData(() =>
+                formFields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), { status: "Sent Application" })
+            );
+            onClose();
+
+        } catch(error: any) {
+            if (error?.response) {
+                const { status } = error.response;
+
+                if (status === 400) {
+                    addToast("warning", "Please check the form fields and try again.");
+                } else if (status === 500) {
+                    addToast("error", "Server error. Please try again later.");
+                } else {
+                    addToast("error", "An unexpected error occurred.");
+                }
+            } else {
+                addToast("error", "Network error. Please check your internet connection.");
+            }
+        }
+    }
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
