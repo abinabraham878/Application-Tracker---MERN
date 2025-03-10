@@ -51,13 +51,13 @@ const Header = ({ handleOpenModal }: { handleOpenModal: () => void }) => {
 
           {showMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
-              <a
+              {/* <a
                 href="/profile"
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer w-full text-left"
               >
                 <CircleUserRound size={16} className="text-blue-600" />
                 <span>My Profile</span>
-              </a>
+              </a> */}
               <button
                 onClick={logout}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left cursor-pointer"

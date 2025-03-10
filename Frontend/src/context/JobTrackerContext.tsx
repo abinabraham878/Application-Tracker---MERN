@@ -15,20 +15,36 @@ export interface JobApplication {
     userId: string;
 }
 
-const initialState: { applications: JobApplication[], error: null | string, loading: boolean } = {
+const initialState: { applications: JobApplication[], jobStatusCount: { [key: string]: number }, error: null | string, loading: boolean } = {
     applications: [],
+    jobStatusCount: {},
     error: null,
     loading: true
-  };
+};
 
 interface JobApplicationProviderProps {
   children: ReactNode;
 }
 
+interface StatusCount {
+    [key: string]: number;
+}
+
+interface FilterPayload {
+    columnName: string;
+    value: string[];
+    operation: string;
+}
+
 interface JobApplicationContextType {
     applications: JobApplication[];
-    getAllApplications: () => void;
-    saveJobApplication: (data: JobApplication) => void;
+    getAllApplications: () => Promise<void>;
+    saveJobApplication: (data: JobApplication) => Promise<void>;
+    updateJobApplication: (data: JobApplication) => Promise<void>;
+    setRowDataId: (id: string) => void;
+    jobStatusCount: () => Promise<void>;
+    statusCount: StatusCount;
+    getJobApplicationByCriteria: (filterPayload: FilterPayload[]) => Promise<void>;
 }
 
 export const JobTrackerContext = createContext<JobApplicationContextType | undefined>(undefined);
@@ -37,7 +53,9 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
     
     const { user } = useContext(AuthContext);
     const { addToast } = useContext(ToastContext);
+    const [rowDataId, setRowDataId] = useState<string | null>(null);
     const [ state, dispatch ] = useReducer(JobTrackerReducer, initialState);
+    const [ statusCount, setStatusCount ] = useState<StatusCount>({});
 
     const getAllApplications = async () => {
         try {
@@ -45,39 +63,122 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
             dispatch({
                 type: "GET_ALL_APPLICATIONS",
                 payload: response.data
-            })
+            });
+            await jobStatusCount();
         } catch (error) {
+            dispatch({
+                type: "ERROR",
+                payload: "Error fetching job applications"
+            });
             addToast("error", "Error fetching job applications");
         }
     };
 
     const saveJobApplication = async (data: JobApplication) => {
-        console.log("Saving job application", data);
         try {
-
             data = {
                 ...data,
                 userId: user?.userId,
-            }
+            };
 
             const response = await axios.post('/api/job-application/create', data);
             if (response.data.success) {
-                addToast("success", "Job application submitted successfully");
+                addToast("success", "Job application saved successfully");
                 dispatch({
                     type: "SAVE_JOB_APPLICATION",
                     payload: response.data.data
-                })
+                });
+                await jobStatusCount();
             }
         } catch (error){
+            dispatch({
+                type: "ERROR",
+                payload: "Error saving job application"
+            });
             addToast("error", "Error saving job application");
         } 
-    }
+    };
+
+    const updateJobApplication = async (data: JobApplication) => {
+        try{
+            if (!rowDataId) {
+                throw new Error("No job application selected for update");
+            }
+            
+            const response = await axios.put('/api/job-application/update/'+rowDataId, data);
+            if(response.data.success){
+                addToast('success', "Job Application updated successfully");
+                dispatch({
+                    type: "UPDATE_JOB_APPLICATION",
+                    payload: response.data.data
+                });
+                await jobStatusCount();
+            }
+        } catch(error) {
+            dispatch({
+                type: "ERROR",
+                payload: "Error updating job application"
+            });
+            addToast("error", "Error updating job application");
+        }
+    };
+
+    const jobStatusCount = async() => {
+        try {
+            const response = await axios.get('/api/job-application/status-count/'+user?.userId);
+            if(response.data.data){
+                dispatch({
+                    type: "UPDATE_JOB_APPLICATION_COUNT",
+                    payload: response.data.data
+                });
+            }
+        } catch(error) {
+            addToast("error", "Error getting job application count");
+            dispatch({
+                type: "ERROR",
+                payload: "Failed to fetch job status counts"
+            });
+        }
+    };
+
+    const getJobApplicationByCriteria = async (filters: FilterPayload[]) => {
+        try {
+            const userFilter = {
+                "columnName": "userId",
+                "value": [user?.userId ?? ""],
+                "operation": "equals"
+            };
+            
+            const updatedFilters = [userFilter, ...filters];
+            
+            const response = await axios.post('/api/job-application/get-job-application-by-criteria', updatedFilters);
+            
+            if(response.data){
+                dispatch({
+                    type: "GET_ALL_APPLICATIONS",
+                    payload: response.data.data || []
+                });
+                await jobStatusCount();
+            }
+        } catch(error) {
+            dispatch({
+                type: "ERROR",
+                payload: "Error getting job applications based on criteria"
+            });
+            addToast("error", "Error getting job applications based on this criteria");
+        }
+    };
     
     return (
         <JobTrackerContext.Provider value={{
             applications: state.applications,
             getAllApplications,
-            saveJobApplication
+            saveJobApplication,
+            updateJobApplication,
+            setRowDataId,
+            jobStatusCount,
+            statusCount: state.jobStatusCount,
+            getJobApplicationByCriteria
         }}>
             {children}
         </JobTrackerContext.Provider>

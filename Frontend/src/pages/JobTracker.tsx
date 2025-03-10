@@ -3,10 +3,11 @@ import { useRef, useState } from 'react'
 import Sidebar from '../components/Sidebar';
 import Layout from '../components/Layout';
 import StatusBoard from '../components/StatusBoard';
-import { CheckCircle, FileText, Users } from 'lucide-react';
+import { CheckCircle, FileText, FileX, Users } from 'lucide-react';
 import Modal from '../components/Modal';
 import JobApplicationForm from './JobApplicationForm';
 import JobApplicationTable from './JobApplicationTable';
+import { JOB_STATUS } from '../Constants/constants';
 
 const JobTracker = () => {
     const [isExpanded, setisExpanded] = useState(false);
@@ -33,7 +34,7 @@ const JobTracker = () => {
             label: "Application Status",
             type: "select",
             required: true,
-            options: ["Sent Application", "Shortlisted", "Interview", "Offer", "Rejected"]
+            options: JOB_STATUS
         }
     ];
 
@@ -44,7 +45,7 @@ const JobTracker = () => {
           label: "Application Status",
           type: "select",
           required: true,
-          options: ["Sent Application", "Shortlisted", "Interview", "Offer", "Rejected"]
+          options: JOB_STATUS
       }
   ];
 
@@ -65,7 +66,8 @@ const JobTracker = () => {
       {
         id: 1,
         title: "Sent Applications",
-        count: "10",
+        dataKey: "Sent Application",
+        count: 0,
         icon: <FileText size={20} className="text-blue-500" />,
         color: "bg-blue-100",
         textColor: "text-blue-600"
@@ -73,7 +75,8 @@ const JobTracker = () => {
       {
         id: 2,
         title: "Shortlisted Applications",
-        count: "5",
+        dataKey: "Shortlisted",
+        count: 0,
         icon: <FileText size={20} className="text-yellow-500" />,
         color: "bg-yellow-100",
         textColor: "text-yellow-600"
@@ -81,26 +84,47 @@ const JobTracker = () => {
       {
         id: 3,
         title: "Shortlisted For Interviews",
-        count: "3",
+        dataKey: "Interview Scheduled",
+        count: 0,
         icon: <Users size={20} className="text-purple-500" />,
         color: "bg-purple-100",
         textColor: "text-purple-600"
       },
       {
         id: 4,
+        title: "Shortlisted For Technical Interview",
+        dataKey: "Technical Interview",
+        count: 0,
+        icon: <Users size={20} className="text-purple-500" />,
+        color: "bg-purple-100",
+        textColor: "text-purple-600"
+      },
+      {
+        id: 5,
         title: "Final Round Interviews",
-        count: "2",
+        dataKey: "Final Interview",
+        count: 0,
         icon: <Users size={20} className="text-orange-500" />,
         color: "bg-orange-100",
         textColor: "text-orange-600"
       },
       {
-        id: 5,
+        id: 6,
         title: "Offer Letter Confirmed",
-        count: "1",
+        dataKey: "Offer Confirmed",
+        count: 0,
         icon: <CheckCircle size={20} className="text-green-500" />,
         color: "bg-green-100",
         textColor: "text-green-600"
+      },
+      {
+        id: 7,
+        title: "Rejected",
+        dataKey: "Rejected",
+        count: 0,
+        icon: <FileX size={20} className="text-red-500" />,
+        color: "bg-red-100",
+        textColor: "text-red-600"
       }
     ];
   
@@ -116,7 +140,7 @@ const JobTracker = () => {
            title="Add New Job Application"
            showSaveBtn={true}
            saveButtonText="Save Job Application"
-           onSubmitClicked={() => childRef.current?.submit()}
+           onSubmitClicked={() => childRef.current?.submit('save')}
            >
             <JobApplicationForm ref={childRef} onClose={handleCloseModal} formFields={formFields}/>
           </Modal>
@@ -126,7 +150,7 @@ const JobTracker = () => {
            title="Change Job Status"
            showSaveBtn={true}
            saveButtonText="Save Job Status"
-           onSubmitClicked={() => childRef.current?.submit()}
+           onSubmitClicked={() => childRef.current?.submit('update')}
            modalWidth='500px'>
             <JobApplicationForm ref={childRef} onClose={handleCloseModal} formFields={statusFormFields} />
            </Modal>
