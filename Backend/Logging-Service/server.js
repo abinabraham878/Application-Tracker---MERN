@@ -4,6 +4,9 @@ const connectDB = require('./config/dbConfig');
 const cors = require('cors');
 const consumeMessage = require('./Consumer/rabbitmqConsumer');
 
+// Load Routes
+const logRoutes = require("./Routes/ActivityRoutes");
+
 // Load environment variables
 dotenv.config({ path: './config/config.env' });
 
@@ -19,6 +22,9 @@ app.use(cors());
 app.get('/ping-me', (req, res) => {
   res.status(204).send();  // Returning 204 No Content as no body is needed
 });
+
+// Routes
+app.use('/api/log', logRoutes);
 
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {

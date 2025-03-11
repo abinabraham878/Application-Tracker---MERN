@@ -17,14 +17,6 @@ const JobApplicationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    usedResume:{
-        type: String,
-        required: false
-    },
-    usedCoverLetter:{
-        type: String,
-        required: false
-    },
     status:{
         type: String,
         required: true
