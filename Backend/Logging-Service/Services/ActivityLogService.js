@@ -13,7 +13,7 @@ class ActivityLogService {
         activityType: "CREATED",
         previousState: null,
         newState: this._sanitizeJobData(jobApplication),
-        changedFields: Object.keys(jobApplication.toObject()).filter(
+        changedFields: Object.keys(jobApplication).filter(
           (key) => !["_id", "__v", "createdAt", "updatedAt"].includes(key)
         ),
       });
