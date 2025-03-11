@@ -62,7 +62,7 @@ export const JobTrackerProvider = ({ children }: JobApplicationProviderProps) =>
             const response = await axios.get("/api/job-application/all/" + user?.userId);
             dispatch({
                 type: "GET_ALL_APPLICATIONS",
-                payload: response.data
+                payload: response.data.data
             });
             await jobStatusCount();
         } catch (error) {
