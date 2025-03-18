@@ -20,7 +20,9 @@ app.use(cors());
 
 // PING Route
 app.get('/ping-me', (req, res) => {
-    res.status(204).send(); // Returning 204 No Content as no response body
+    res.status(200).json({
+        date: new Date()
+      }); // Returning 204 No Content as no response body
 });
 
 // Routes
