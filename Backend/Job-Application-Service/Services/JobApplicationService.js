@@ -115,7 +115,7 @@ const jobApplicationStatusCount = async (req, res, next) => {
 // Get job applications by filter criteria
 const getJobApplicationsByCriteria = async (req, res, next) => {
   try {
-    const { filters } = req.body;
+    const filters  = req.body;
 
     if (!Array.isArray(filters)) {
       return res.status(400).json({ success: false, message: "Filters must be an array" });
